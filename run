@@ -1,4 +1,2 @@
 #!/bin/sh
-
-ghc -O2 Bench.hs
-./Bench -o bench.html
+stack build && stack exec freemonad-benchmark -- -o results.html
