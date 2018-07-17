@@ -1,5 +1,3 @@
-* * *
-
 A benchmark comparing the performance of different free monad implementations.
 
 The benchmark simulates the state monad using various flavors of free monads,
