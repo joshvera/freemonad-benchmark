@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications #-}
 module Main (main) where
 
 import Base
@@ -9,6 +9,8 @@ import qualified Codensity
 import qualified NoRemorse
 import qualified Freer
 import qualified Fused
+import qualified Control.Monad.Effect as Effect
+import qualified Control.Monad.Effect.State as Effect
 import Control.Monad
 import qualified Control.Monad.State.Strict as MTL
 
@@ -29,7 +31,7 @@ benchmarks :: (forall m. MonadFree F m => Comp m)
            -> Comp (Fused.Codensity Fused.H)
            -> Comp (MTL.State Int)
            -> [Benchmark]
-benchmarks generic monadstate fused mtl = 
+benchmarks generic monadstate fused mtl =
   [ bench "Free strict/generic" $ run_bench (Free.run . generic) n
   , bench "Free lazy/generic" $ run_bench (Free.runLazily . generic) n
   , bench "Church/generic" $ run_bench (Church.run . generic) n
@@ -59,6 +61,7 @@ main = defaultMain
     , bench "Fused/generic" $ run_bench (Fused.run . computation) n
     , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation) n
     , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation) n
+    , bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation @Effect.Eff) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation) n
     ]
@@ -71,6 +74,7 @@ main = defaultMain
     , bench "NoRemorse/generic" $ run_bench (NoRemorse.run . computation2) n
     , bench "Freer/generic" $ run_bench (Freer.run . computation2) n
     , bench "Fused/generic" $ run_bench (Fused.run . computation2) n
+    , bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation2 @Effect.Eff) n
     , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation2) n
     , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation2) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
