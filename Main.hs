@@ -17,7 +17,7 @@ import qualified Control.Monad.State.Strict as MTL
 import Criterion (bench, nf, bgroup, Benchmark)
 import Criterion.Main (defaultMain)
 
-n = 50
+n = 100
 
 {-
 -- Passing computations with higher rank 'forall m...'
