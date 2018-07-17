@@ -18,7 +18,7 @@ cabal-version:       >=1.10
 
 executable freemonad-benchmark
   main-is:             Main.hs
-  build-depends:       base, criterion, mtl, effects
+  build-depends:       base, criterion, mtl, effects, free-vl
   default-language:    Haskell2010
   default-extensions:
     MultiParamTypeClasses

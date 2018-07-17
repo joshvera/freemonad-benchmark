@@ -1,13 +1,14 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, RankNTypes, TypeApplications #-}
 module Computation where
 
-import Base
-import Control.Monad
-import Control.Monad.State.Class
-import qualified Control.Monad.State.Strict as MTL
-import qualified Fused
+import           Base
+import           Control.Monad
 import qualified Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.State as Effect
+import           Control.Monad.Free.VanLaarhovenE
+import           Control.Monad.State.Class
+import qualified Control.Monad.State.Strict as MTL
+import qualified Fused
 
 {- It is only fair to give the computations that use a free monad the same
 advantage as MTL, namely that they become specialized to the concrete monad
@@ -94,3 +95,25 @@ fusedComputation2 n =
       computation2 (n-1)
       s <- Base.get
       Base.put $! s + 1
+
+data State s m = State { getState :: m s, putState :: s -> m () }
+
+get_ :: HasEffect effects (State s) => Free effects s
+get_  = liftF getState
+
+put_ :: HasEffect effects (State s) => s -> Free effects ()
+put_ s = liftF (\st -> putState st s)
+
+vlComputation :: (HasEffect effects (State Int)) => Int -> Free effects ()
+
+vlComputation n = forM_ [1..n] $ \_ -> do
+    s <- get_
+    put_ $! s + (1::Int)
+
+myState :: State s (MTL.State s)
+myState = State {getState = MTL.get, putState = MTL.put}
+
+stateInterp = myState .:. EmptyE
+
+vl  :: Free '[State Int] a -> MTL.State Int a
+vl = iterM stateInterp

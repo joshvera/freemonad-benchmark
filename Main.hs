@@ -1,21 +1,22 @@
 {-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications #-}
 module Main (main) where
 
-import Base
-import Computation
-import qualified Free
+import           Base
 import qualified Church
 import qualified Codensity
-import qualified NoRemorse
-import qualified Freer
-import qualified Fused
+import           Computation
+import           Control.Monad
 import qualified Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.State as Effect
-import Control.Monad
 import qualified Control.Monad.State.Strict as MTL
+import qualified Free
+import qualified Freer
+import qualified Fused
+import qualified NoRemorse
 
-import Criterion (bench, nf, bgroup, Benchmark)
-import Criterion.Main (defaultMain)
+import qualified Control.Monad.Free.VanLaarhovenE as VL
+import           Criterion (Benchmark, bench, bgroup, nf)
+import           Criterion.Main (defaultMain)
 
 n = 100
 
@@ -64,6 +65,7 @@ main = defaultMain
     , bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation @Effect.Eff) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation) n
+    , bench "VL/generic" $ nf (flip MTL.runState 0 . vl . vlComputation) n
     ]
   , bgroup "Left-assoc" $
     -- benchmarks computation2 msComputation2 fusedComputation2 mtlComputation2
