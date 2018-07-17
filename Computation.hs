@@ -24,7 +24,7 @@ below. Or you can let the compiler do it with a SPECIALIZE pragma, see e.g. the
 one for msComputation+Fused below.
 -}
 
-effComputation :: (Monad (m effects), Effect.Effectful m, Effect.Member (Effect.State Int) effects) => Int -> m effects ()
+effComputation :: Int -> Effect.Eff '[Effect.State Int] ()
 effComputation n = forM_ [1..n]  $ \_ -> do
   s <- Effect.get @Int
   Effect.put $! (s + 1)
@@ -59,7 +59,7 @@ computation2 n =
       s <- Base.get
       Base.put $! s + 1
 
-effComputation2 :: (Monad (m effects), Effect.Effectful m, Effect.Member (Effect.State Int) effects) => Int -> m effects ()
+effComputation2 :: Int -> Effect.Eff '[Effect.State Int] ()
 effComputation2 n = forM_ [1..n]  $ \_ -> do
   if n == 0
     then return ()

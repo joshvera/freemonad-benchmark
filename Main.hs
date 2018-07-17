@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications, DataKinds #-}
 module Main (main) where
 
 import           Base
@@ -13,11 +13,13 @@ import qualified Free
 import qualified Freer
 import qualified Fused
 import qualified NoRemorse
+import qualified Control.Monad.State as State
 
 import qualified Control.Monad.Free.VanLaarhovenE as VL
 import           Criterion (Benchmark, bench, bgroup, nf)
 import           Criterion.Main (defaultMain)
 
+n :: Int
 n = 50
 
 {-
@@ -53,12 +55,12 @@ main :: IO ()
 main = defaultMain
   [ bgroup "Right-assoc" $
     -- benchmarks computation msComputation fusedComputation mtlComputation
-    [ bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation @Effect.Eff) n
-    , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation) n
+    [ bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation) n
     , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation) n
     , bench "Fused/generic" $ run_bench (Fused.run . computation) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation) n
+    , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
     , bench "Freer/generic" $ run_bench (Freer.run . computation) n
     , bench "VL/generic" $ nf (flip MTL.runState 0 . vl . vlComputation) n
     , bench "Free strict/generic" $ run_bench (Free.run . computation) n
@@ -69,12 +71,12 @@ main = defaultMain
     ]
   , bgroup "Left-assoc" $
     -- benchmarks computation2 msComputation2 fusedComputation2 mtlComputation2
-    [ bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation2 @Effect.Eff) n
-    , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation2) n
-    , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
-    , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation2) n
+    [ bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation2) n
     , bench "Fused/generic" $ run_bench (Fused.run . computation2) n
     , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation2) n
+    , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation2) n
+    , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
+    , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
     , bench "Codensity/generic" $ run_bench (Codensity.run . computation2) n
     , bench "Church/generic" $ run_bench (Church.run . computation2) n
     , bench "NoRemorse/generic" $ run_bench (NoRemorse.run . computation2) n
