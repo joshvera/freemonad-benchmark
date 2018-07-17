@@ -18,7 +18,7 @@ import qualified Control.Monad.Free.VanLaarhovenE as VL
 import           Criterion (Benchmark, bench, bgroup, nf)
 import           Criterion.Main (defaultMain)
 
-n = 100
+n = 50
 
 {-
 -- Passing computations with higher rank 'forall m...'
@@ -53,8 +53,7 @@ main :: IO ()
 main = defaultMain
   [ bgroup "Right-assoc" $
     -- benchmarks computation msComputation fusedComputation mtlComputation
-    [
-    , bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation @Effect.Eff) n
+    [ bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation @Effect.Eff) n
     , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation) n
     , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation) n
     , bench "Fused/generic" $ run_bench (Fused.run . computation) n
@@ -70,8 +69,7 @@ main = defaultMain
     ]
   , bgroup "Left-assoc" $
     -- benchmarks computation2 msComputation2 fusedComputation2 mtlComputation2
-    [
-    , bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation2 @Effect.Eff) n
+    [ bench "Effects/generic" $ run_bench (\x -> Effect.run . Effect.runState x . effComputation2 @Effect.Eff) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation2) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
     , bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation2) n
