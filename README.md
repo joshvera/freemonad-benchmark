@@ -1,14 +1,9 @@
-This repository exists for archival purposes only. I am not interested in
-maintaining it. **Please do not open pull requests.**
-
 * * *
 
 A benchmark comparing the performance of different free monad implementations.
 
 The benchmark simulates the state monad using various flavors of free monads,
 and compares them to the standard State monad from transformers.
-
-See also: [Two failed attempts at extensible effects](https://ro-che.info/articles/2014-06-14-extensible-effects-failed).
 
 Note that this is *not* a comparison of extensible effects system. Free
 monads *may* be used to implement an extensible effect system.
@@ -23,7 +18,7 @@ benchmark shows), any effect system based on it won't be fast.
 
 ## Results
 
-[Criterion report](https://rawgit.com/bfrk/freemonad-benchmark/master/results.html)
+[Criterion report](https://rawgit.com/joshvera/freemonad-benchmark/master/results.html)
 
 ## Implementations
 
@@ -47,7 +42,7 @@ benchmark shows), any effect system based on it won't be fast.
     ```
 
 4. **Codensity**
-    
+
     The standard Free monad, codensity-transformed. See
     [Asymptotic Improvement of Computations over Free Monads](http://www.janis-voigtlaender.eu/papers/AsymptoticImprovementOfComputationsOverFreeMonads.pdf).
 
@@ -60,6 +55,15 @@ benchmark shows), any effect system based on it won't be fast.
     The Freer monad from [Freer Monads, More Extensible
     Effects](http://okmij.org/ftp/Haskell/extensible/more.pdf), aka the
     [operational]() monad.
+
+7. **Effects**
+
+    An extensible effects implementation with higher-order effects based off [Freer Monads, More Extensible Effects](http://okmij.org/ftp/Haskell/extensible/more.pdf) maintained by @joshvera and @robrix.
+
+8. **Fused**
+
+    An implementation of [Fusion for Free: Efficient
+    Algebraic Effect Handlers](https://people.cs.kuleuven.be/~tom.schrijvers/Research/papers/mpc2015.pdf) by @brfk.
 
 ## Workloads
 
