@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes #-}
+{-# LANGUAGE FlexibleContexts, RankNTypes, TypeApplications #-}
 module Computation where
 
 import Base
@@ -6,6 +6,8 @@ import Control.Monad
 import Control.Monad.State.Class
 import qualified Control.Monad.State.Strict as MTL
 import qualified Fused
+import qualified Control.Monad.Effect as Effect
+import qualified Control.Monad.Effect.State as Effect
 
 {- It is only fair to give the computations that use a free monad the same
 advantage as MTL, namely that they become specialized to the concrete monad
@@ -20,6 +22,11 @@ Specialization can be done manually, as with mtlComputation and fusedComputation
 below. Or you can let the compiler do it with a SPECIALIZE pragma, see e.g. the
 one for msComputation+Fused below.
 -}
+
+effComputation :: (Monad (m effects), Effect.Effectful m, Effect.Member (Effect.State Int) effects) => Int -> m effects ()
+effComputation n = forM_ [1..n]  $ \_ -> do
+  s <- Effect.get @Int
+  Effect.put $! (s + 1)
 
 computation :: MonadFree F m => Int -> m ()
 computation n = forM_ [1..n] $ \_ -> do
@@ -50,6 +57,15 @@ computation2 n =
       computation2 (n-1)
       s <- Base.get
       Base.put $! s + 1
+
+effComputation2 :: (Monad (m effects), Effect.Effectful m, Effect.Member (Effect.State Int) effects) => Int -> m effects ()
+effComputation2 n = forM_ [1..n]  $ \_ -> do
+  if n == 0
+    then return ()
+    else do
+      effComputation2 (n - 1)
+      s <- Effect.get @Int
+      Effect.put $! s + 1
 
 msComputation2 :: MonadState Int m => Int -> m ()
 msComputation2 n =
