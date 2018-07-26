@@ -55,9 +55,9 @@ main :: IO ()
 main = defaultMain
   [ bgroup "Right-assoc" $
     -- benchmarks computation msComputation fusedComputation mtlComputation
-    [ bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation) n
-    , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation) n
-    , bench "Fused/generic" $ run_bench (Fused.run . computation) n
+    [ bench "Fused/specialized" $ run_bench (Fused.run' . fusedComputation) n
+    , bench "Fused/monadstate" $ run_bench (Fused.run' . msComputation) n
+    -- , bench "Fused/generic" $ run_bench (Fused.run' . computation) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation) n
     , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
@@ -71,9 +71,9 @@ main = defaultMain
     ]
   , bgroup "Left-assoc" $
     -- benchmarks computation2 msComputation2 fusedComputation2 mtlComputation2
-    [ bench "Fused/specialized" $ run_bench (Fused.run . fusedComputation2) n
-    , bench "Fused/generic" $ run_bench (Fused.run . computation2) n
-    , bench "Fused/monadstate" $ run_bench (Fused.run . msComputation2) n
+    [ bench "Fused/specialized" $ run_bench (Fused.run' . fusedComputation2) n
+    -- , bench "Fused/generic" $ run_bench (Fused.run' . computation2) n
+    , bench "Fused/monadstate" $ run_bench (Fused.run' . msComputation2) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation2) n
     , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
     , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
