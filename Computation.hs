@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, RankNTypes, TypeApplications #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, RankNTypes, TypeApplications, TypeOperators #-}
 module Computation where
 
 import           Base
@@ -9,6 +9,7 @@ import           Control.Monad.Free.VanLaarhovenE
 import           Control.Monad.State.Class
 import qualified Control.Monad.State.Strict as MTL
 import qualified Fused
+import GHC.Generics
 
 {- It is only fair to give the computations that use a free monad the same
 advantage as MTL, namely that they become specialized to the concrete monad
@@ -38,17 +39,17 @@ msComputation :: MonadState Int m => Int -> m ()
 msComputation n = forM_ [1..n] $ \_ -> do
   s <- MTL.get
   MTL.put $! s + 1
-{-# SPECIALIZE msComputation :: Int -> Fused.Codensity Fused.H () #-}
+{-# SPECIALIZE msComputation :: Int -> Fused.Codensity (Fused.StateCarrier Int (Fused.Free Fused.Void)) () #-}
 
 mtlComputation :: Int -> MTL.State Int ()
 mtlComputation n = forM_ [1..n] $ \_ -> do
   s <- MTL.get
   MTL.put $! s + 1
 
-fusedComputation :: Int -> Fused.Codensity Fused.H ()
+fusedComputation :: Int -> Fused.Codensity (Fused.StateCarrier Int (Fused.Free Fused.Void)) ()
 fusedComputation n = forM_ [1..n] $ \_ -> do
-  s <- Base.get
-  Base.put $! s + 1
+  s <- MTL.get
+  MTL.put $! s + 1
 
 computation2 :: MonadFree F m => Int -> m ()
 computation2 n =
@@ -76,7 +77,8 @@ msComputation2 n =
       msComputation2 (n-1)
       s <- MTL.get
       MTL.put $! s + 1
-{-# SPECIALIZE msComputation2 :: Int -> Fused.Codensity Fused.H () #-}
+{-# SPECIALIZE msComputation2 :: Int -> Fused.Codensity (Fused.StateCarrier Int (Fused.Free Fused.Void)) () #-}
+
 
 mtlComputation2 :: Int -> MTL.State Int ()
 mtlComputation2 n =
@@ -87,14 +89,14 @@ mtlComputation2 n =
       s <- MTL.get
       MTL.put $! s + 1
 
-fusedComputation2 :: Int -> Fused.Codensity Fused.H ()
+fusedComputation2 :: Int -> Fused.Codensity (Fused.StateCarrier Int (Fused.Free Fused.Void)) ()
 fusedComputation2 n =
   if n == 0
     then return ()
     else do
-      computation2 (n-1)
-      s <- Base.get
-      Base.put $! s + 1
+      msComputation2 (n-1)
+      s <- MTL.get
+      MTL.put $! s + 1
 
 data State s m = State { getState :: m s, putState :: s -> m () }
 
