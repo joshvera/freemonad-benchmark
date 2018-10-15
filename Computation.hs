@@ -3,6 +3,7 @@ module Computation where
 
 import           Base
 import           Control.Monad
+import qualified Control.Effect as HEffect
 import qualified Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.State as Effect
 import           Control.Monad.Free.VanLaarhovenE
@@ -24,6 +25,11 @@ Specialization can be done manually, as with mtlComputation and fusedComputation
 below. Or you can let the compiler do it with a SPECIALIZE pragma, see e.g. the
 one for msComputation+Fused below.
 -}
+
+heffComputation :: (HEffect.Carrier sig m, HEffect.Effect sig) => Int -> HEffect.Eff (HEffect.StateC Int m) ()
+heffComputation n = forM_ [1..n]  $ \_ -> do
+  s <- HEffect.get @Int
+  HEffect.put $! (s + 1)
 
 effComputation :: Int -> Effect.Eff '[Effect.State Int] ()
 effComputation n = forM_ [1..n]  $ \_ -> do
@@ -60,8 +66,17 @@ computation2 n =
       s <- Base.get
       Base.put $! s + 1
 
+heffComputation2 :: (HEffect.Carrier sig m, HEffect.Effect sig) => Int -> HEffect.Eff (HEffect.StateC Int m) ()
+heffComputation2 n =
+  if n == 0
+    then return ()
+    else do
+      heffComputation2 (n - 1)
+      s <- HEffect.get @Int
+      HEffect.put $! s + 1
+
 effComputation2 :: Int -> Effect.Eff '[Effect.State Int] ()
-effComputation2 n = forM_ [1..n]  $ \_ -> do
+effComputation2 n =
   if n == 0
     then return ()
     else do

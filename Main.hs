@@ -6,6 +6,7 @@ import qualified Church
 import qualified Codensity
 import           Computation
 import           Control.Monad
+import qualified Control.Effect as HEffect
 import qualified Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.State as Effect
 import qualified Control.Monad.State.Strict as MTL
@@ -60,6 +61,7 @@ main = defaultMain
     -- , bench "Fused/generic" $ run_bench (Fused.run' . computation) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation) n
     -- , bench "MTL/generic" $ run_bench (MTL.runState . msComputation) n
+    , bench "HEffects/generic" $ run_bench ((HEffect.run .) . flip HEffect.runState . heffComputation) n
     , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
     -- , bench "Freer/generic" $ run_bench (Freer.run . computation) n
     -- , bench "VL/generic" $ nf (flip MTL.runState 0 . vl . vlComputation) n
@@ -76,7 +78,8 @@ main = defaultMain
     -- , bench "Fused/monadstate" $ run_bench (Fused.run' . msComputation2) n
     , bench "MTL/specialized" $ run_bench (MTL.runState . mtlComputation2) n
     -- , bench "MTL/generic" $ run_bench (MTL.runState . msComputation2) n
-    , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation) n
+    , bench "HEffects/generic" $ run_bench ((HEffect.run .) . flip HEffect.runState . heffComputation2) n
+    , bench "Effects/generic" $ run_bench ((Effect.run .) . flip Effect.runState . effComputation2) n
     -- , bench "Codensity/generic" $ run_bench (Codensity.run . computation2) n
     -- , bench "Church/generic" $ run_bench (Church.run . computation2) n
     -- , bench "NoRemorse/generic" $ run_bench (NoRemorse.run . computation2) n
