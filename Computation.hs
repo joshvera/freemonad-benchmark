@@ -4,6 +4,7 @@ module Computation where
 import           Base
 import           Control.Monad
 import qualified Control.Effect as HEffect
+import qualified Control.Effect.State as HEffect
 import qualified Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.State as Effect
 import           Control.Monad.Free.VanLaarhovenE

@@ -11,8 +11,8 @@ packages:
     commit: 0b6d04713b70e6b0551b841304fb44c9b1564e9b
   extra-dep: true
 - location:
-    git: https://github.com/robrix/higher-order-effects
-    commit: 59f19b009473a2ad0ef17d2b62b9dd61536926ac
+    git: https://github.com/robrix/fused-effects
+    commit: 7421ffa4e2d05b961fb0347ddab5ebdef9e32f25
   extra-dep: true
 
 
