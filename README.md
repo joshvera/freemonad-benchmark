@@ -16,7 +16,7 @@ benchmark shows), any effect system based on it won't be fast.
 
 ## Results
 
-[Criterion report](https://rawgit.com/joshvera/freemonad-benchmark/master/results.html)
+[Criterion report](https://s3.amazonaws.com/www.patrickthomson.net/results.html)
 
 ## Implementations
 
